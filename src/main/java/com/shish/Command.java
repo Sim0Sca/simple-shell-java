@@ -1,5 +1,6 @@
 package com.shish;
 
+import java.io.File;
 import java.util.ArrayList;
 
 public abstract class Command {
@@ -7,34 +8,56 @@ public abstract class Command {
     static ArrayList<Command> commands = new ArrayList<>();
     static final String pathEnv = System.getenv("PATH"); // PATH variable
 
-    public String command = "";
-    public ArrayList<String> aliases = new ArrayList<>();
-    public ArrayList<String> parameters = new ArrayList<>();
-    public abstract void execute();
-    public abstract String getCommand();
+
+    protected String command = "";
+    protected ArrayList<String> aliases = new ArrayList<>();
+    protected ArrayList<String> parameters = new ArrayList<>();
+
+    protected abstract void execute();
+
+    protected static File currentPath = new File("");
+    protected static String cwd = currentPath.getAbsolutePath();
 
     /**
      * Return the parameters in the initial state in order to be reused later
-     * @param aliases
-     * @param parameters
      */
-    public void reset(ArrayList<String> aliases, ArrayList<String> parameters) {
+    public void reset() {
         aliases.clear();
         parameters.clear();
-    };
+    }
+
+    ;
+
+
+    public String getCommand() {
+        return command;
+    }
 
     /**
      * Valid for getting and setting commands
+     *
      * @param command
      * @return
      */
-    public String setCommand(String command) {
-        return command;
+    public void setCommand(String command) {
+        this.command = command;
     }
-    public abstract ArrayList<String> getAliases();
-    public abstract void setAliases(String alias);
-    public abstract ArrayList<String> getParameters();
-    public abstract void setParameters(String parameter);
+
+    public ArrayList<String> getAliases() {
+        return aliases;
+    }
+
+    public void setAliases(String alias) {
+        aliases.add(alias);
+    }
+
+    public ArrayList<String> getParameters() {
+        return parameters;
+    }
+
+    public void setParameters(String parameter) {
+        parameters.add(parameter);
+    }
 
     public String getPathEnv() {
         return pathEnv;
@@ -44,14 +67,18 @@ public abstract class Command {
         commands.add(new Echo("echo"));
         commands.add(new Type("type"));
         commands.add(new PWD("pwd"));
+        commands.add(new CD("cd"));
         // TODO: Add other commands...
-    };
+    }
+
+    ;
 
     /**
      * Split all the inputs in the parts:
      * Command (String)
      * Aliases (List of strings)
      * Parameters (List of strings)
+     *
      * @param input
      * @return
      */
@@ -73,6 +100,7 @@ public abstract class Command {
 
     /**
      * Look for the command and return it
+     *
      * @param command
      * @return
      */

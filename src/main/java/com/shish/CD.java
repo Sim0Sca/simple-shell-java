@@ -1,36 +1,53 @@
 package com.shish;
 
-import java.util.ArrayList;
+import java.io.File;
 
 public class CD extends Command {
 
-    @Override
-    public void execute() {
+    File dirObj; // For changing directory
 
+    public CD(String cd) {
+        setCommand(cd);
+        dirObj = null;
+    };
+
+    public String getPreviousDirectory(String cwd) {
+        String previousDir = "";
+        int index = cwd.lastIndexOf("/");
+        previousDir = cwd.substring(0, index);
+        return previousDir;
     }
 
     @Override
-    public String getCommand() {
-        return command;
-    }
+    protected void execute() {
+        String dir = "";
+        if (!parameters.getFirst().isEmpty()) {
+            dir = parameters.getFirst();
+            if (dir.startsWith("..")) {
+                int index = 0, count = 0; // These var are not really necessary, but I will keep them anyway
+                while ((index = dir.indexOf("..", index)) != -1 ){
+                    count++;
+                    cwd = getPreviousDirectory(cwd);
+                    index++;
+                }
+                dirObj = new File(cwd); // Doesn't add the new directory
+            } else if (dir.startsWith(".")) {
+                dir = dir.substring(2);
+                dirObj = new File(cwd + "/" + dir);
+            } else if (dir.startsWith("/")) { // Absolute parth
+                dirObj = new File(cwd + "/" + dir);
+            } else { // Nothing before dir name
+                dirObj = new File(cwd + "/" + dir);
+            }
+        }
 
-    @Override
-    public ArrayList<String> getAliases() {
-        return aliases;
-    }
+        //System.out.println("dirObj " + dirObj);
+        if (dirObj.exists()) {
+            cwd = dirObj.getAbsolutePath();
+        } else {
+            System.out.println("cd: " + dir + ": No such file or directory");
+        }
 
-    @Override
-    public void setAliases(String alias) {
-        aliases.add(alias);
-    }
-
-    @Override
-    public ArrayList<String> getParameters() {
-        return null;
-    }
-
-    @Override
-    public void setParameters(String parameter) {
-
+        reset();
     }
 }

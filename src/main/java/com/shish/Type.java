@@ -6,12 +6,9 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Type extends Command {
-    private String command;
-    private ArrayList<String> aliases;
-    private ArrayList<String> parameters;
 
     public Type(String type) {
-        command = setCommand(type);
+        setCommand(type);
         this.aliases = new ArrayList<>();
         this.parameters = new ArrayList<>();
     }
@@ -33,7 +30,7 @@ public class Type extends Command {
                             + "/" + findProgramStream.get(2)); // el
                 }
             }
-            reset(aliases, parameters);
+            reset();
         } else {
             System.out.println();
         }
@@ -68,6 +65,7 @@ public class Type extends Command {
         return "";
     }
 
+    /*
     @Override
     public String getCommand() {
         return command;
@@ -92,4 +90,5 @@ public class Type extends Command {
     public void setParameters(String parameter) {
         parameters.add(parameter);
     }
+    */
 }

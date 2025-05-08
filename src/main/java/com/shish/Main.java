@@ -1,8 +1,6 @@
 package com.shish;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Locale;
 import java.util.Scanner;
 
 public class Main {
@@ -19,10 +17,10 @@ public class Main {
 
         // Check if the command is inserted
         while (!(input = scanner.nextLine()).isEmpty()) {
-            if (input.toLowerCase().startsWith("exit")) {
+            if (input.startsWith("exit")) {
                 break;
             } else {
-                actualCmd = Command.inputSplitter(input.toLowerCase());
+                actualCmd = Command.inputSplitter(input);
                 if (actualCmd != null) {
                     actualCmd.execute();
                 }
