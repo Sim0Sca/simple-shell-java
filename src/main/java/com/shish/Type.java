@@ -36,7 +36,7 @@ public class Type extends Command {
         }
     }
 
-    private String checkPath(String command) {
+    public String checkPath(String command) {
         boolean pathFound = false;
         // Convert the String to a List
         List<String> paths = Arrays.asList(pathEnv.split(":"));
@@ -64,31 +64,4 @@ public class Type extends Command {
 
         return "";
     }
-
-    /*
-    @Override
-    public String getCommand() {
-        return command;
-    }
-
-    @Override
-    public ArrayList<String> getAliases() {
-        return aliases;
-    }
-
-    @Override
-    public void setAliases(String alias) {
-        aliases.add(alias);
-    }
-
-    @Override
-    public ArrayList<String> getParameters() {
-        return parameters;
-    }
-
-    @Override
-    public void setParameters(String parameter) {
-        parameters.add(parameter);
-    }
-    */
 }

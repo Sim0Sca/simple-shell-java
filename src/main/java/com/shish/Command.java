@@ -1,7 +1,12 @@
 package com.shish;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public abstract class Command {
 
@@ -15,8 +20,34 @@ public abstract class Command {
 
     protected abstract void execute();
 
-    protected static File currentPath = new File("");
+    protected static File currentPath = new File(System.getProperty("user.home"));
     protected static String cwd = currentPath.getAbsolutePath();
+
+    private static Echo echo;
+    private static Type type;
+    private static PWD pwd;
+
+    public static String getCwd() {
+        return cwd;
+    }
+
+    private static Command cd;
+
+    public static Echo getEcho() {
+        return echo;
+    }
+
+    public static Type getType() {
+        return type;
+    }
+
+    public static PWD getPwd() {
+        return pwd;
+    }
+
+    public static Command getCd() {
+        return cd;
+    }
 
     /**
      * Return the parameters in the initial state in order to be reused later
@@ -59,19 +90,19 @@ public abstract class Command {
         parameters.add(parameter);
     }
 
-    public String getPathEnv() {
+    public static String getPathEnv() {
         return pathEnv;
     }
 
     public static void addCommands() {
-        commands.add(new Echo("echo"));
-        commands.add(new Type("type"));
-        commands.add(new PWD("pwd"));
-        commands.add(new CD("cd"));
+        commands.add(echo = new Echo("echo"));
+        commands.add(type = new Type("type"));
+        commands.add(pwd = new PWD("pwd"));
+        commands.add(cd = new CD("cd"));
         // TODO: Add other commands...
     }
 
-    ;
+
 
     /**
      * Split all the inputs in the parts:
@@ -82,7 +113,7 @@ public abstract class Command {
      * @param input
      * @return
      */
-    public static Command inputSplitter(String input) {
+    public static Command inputSplitter(String input) throws IOException, InterruptedException {
         Command actualCmd = null;
         String[] command = input.split(" ");
 
@@ -91,8 +122,15 @@ public abstract class Command {
             for (int i = 1; i < command.length; i++) {
                 actualCmd.setParameters(command[i]);
             }
-        } else {
-            System.out.println(input + ": not found");
+        } else { // Check for PATH's programs
+            // FIXME: Changing cd in the program doesn't change it in the Shell
+            String program = type.checkPath(command[0]);
+            if (!program.isEmpty()) {
+                executePath(program, input);
+            } else {
+                System.out.println(input + ": not found");
+            }
+            //System.out.println(input + ": not found");
         }
 
         return actualCmd;
@@ -111,5 +149,54 @@ public abstract class Command {
             }
         }
         return null;
+    }
+
+    // FIXME: It doesn't work with other programs that require input (like nano)
+    public static void executePath(String program, String input) throws IOException, InterruptedException {
+        List<String> findProgramStream = Arrays.asList(program.split(":"));
+        File currentProgram = new File(findProgramStream.get(1)
+                + "/" + findProgramStream.get(2));
+        // Check if the file is executable
+        if (currentProgram.canExecute()) {
+            Runtime run = Runtime.getRuntime();
+
+            // Take the parameters of the input
+            String[] commandWithArgs = input.split(" ");
+
+            if (commandWithArgs.length > 1) {
+                // Add the current working dir to the command
+                List<String> list = new ArrayList<>(Arrays.stream(commandWithArgs).toList());
+                String tmp = list.getLast();
+                list.removeLast();
+                if (tmp.startsWith("-")) { // It is a flag
+                    list.add(cwd);
+                    list.add(tmp);
+                } else { // It is a parameter
+                    list.add(cwd + "/" + tmp);
+                }
+                commandWithArgs = list.toArray(new String[0]);
+            } else {
+                List<String> list = new ArrayList<>(Arrays.stream(commandWithArgs).toList());
+                list.add(cwd);
+                commandWithArgs = list.toArray(new String[0]);
+            }
+
+            Process proc = run.exec(commandWithArgs);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
+            }
+
+            // Manage the errors
+            BufferedReader errorReader = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
+            while ((line = errorReader.readLine()) != null) {
+                System.err.println(line);
+            }
+
+            // Wait for the termination of the process
+            proc.waitFor();
+            // break;
+        }
     }
 }

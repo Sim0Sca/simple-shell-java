@@ -1,19 +1,16 @@
 package com.shish;
 
-import java.io.File;
+import java.io.IOException;
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) {
-        System.out.print("$ "); // Commands input
-
+    public static void main(String[] args) throws IOException, InterruptedException {
         Scanner scanner = new Scanner(System.in);
         String input = "";
-        String result = ""; // Take the checkParameter String
-        String pathEnv = System.getenv("PATH"); // PATH variable
-        File dirObj = null; // For changing directory
         Command actualCmd = null;
         Command.addCommands();
+
+        System.out.print(Command.getCwd() + "$ "); // Commands input
 
         // Check if the command is inserted
         while (!(input = scanner.nextLine()).isEmpty()) {
@@ -25,7 +22,7 @@ public class Main {
                     actualCmd.execute();
                 }
             }
-            System.out.print("$ "); // New input
+            System.out.print(Command.getCwd() + "$ "); // New input
         }
 
     }
