@@ -24,7 +24,7 @@ public class CD extends Command {
         if (!parameters.getFirst().isEmpty()) {
             dir = parameters.getFirst();
             if (dir.startsWith("..")) {
-                int index = 0, count = 0; // These var are not really necessary, but I will keep them anyway
+                int index = 0, count = 0;
                 while ((index = dir.indexOf("..", index)) != -1 ){
                     count++;
                     cwd = getPreviousDirectory(cwd);
@@ -34,7 +34,7 @@ public class CD extends Command {
             } else if (dir.startsWith(".")) {
                 dir = dir.substring(2);
                 dirObj = new File(cwd + "/" + dir);
-            } else if (dir.startsWith("/")) { // Absolute parth
+            } else if (dir.startsWith("/")) { // Absolute path
                 dirObj = new File(cwd + "/" + dir);
             } else { // Nothing before dir name
                 dirObj = new File(cwd + "/" + dir);

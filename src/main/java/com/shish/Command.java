@@ -57,8 +57,6 @@ public abstract class Command {
         parameters.clear();
     }
 
-    ;
-
 
     public String getCommand() {
         return command;
@@ -116,6 +114,53 @@ public abstract class Command {
     public static Command inputSplitter(String input) throws IOException, InterruptedException {
         Command actualCmd = null;
         String[] command = input.split(" ");
+        ArrayList<String> commandSwap = new ArrayList<>();
+        commandSwap.add(command[0]);
+        boolean isEdited = false;
+
+        StringBuilder tmpParameter = new StringBuilder();
+        // Look for parameters delimited with " and merge it
+        for (int i = 0; i < command.length; i++) {
+            if (command[i].startsWith("\"") || command[i].startsWith("'")) {
+                // Look for the other "
+                for (int j = i; j < command.length; j++) {
+                    if (command[j].endsWith("\"") || command[j].endsWith("'")) {
+                        tmpParameter.append(command[j]);
+                        break;
+                    } else {
+                        tmpParameter.append(command[j]).append(" ");
+                    }
+                }
+                commandSwap.add(tmpParameter.toString());
+                // Add the parameter
+                isEdited = true;
+            }
+        }
+
+        if (isEdited) {
+            command = new String[commandSwap.size()];
+            for (int i = 0; i < commandSwap.size(); i++) {
+                command[i] = commandSwap.get(i);
+            }
+        }
+
+        int quotesIndex;
+        StringBuilder tmpBuilder;
+        boolean isDeleted = false;
+        for (int i = 0; i < command.length; i++) { // Remove the " from the parameters
+            tmpBuilder = new StringBuilder(command[i]);
+            while ((quotesIndex = tmpBuilder.indexOf("\"")) != -1) {
+                tmpBuilder.deleteCharAt(quotesIndex);
+                isDeleted = true;
+            }
+            while ((quotesIndex = tmpBuilder.indexOf("'")) != -1) {
+                tmpBuilder.deleteCharAt(quotesIndex);
+                isDeleted = true;
+            }
+            if (isDeleted) {
+                command[i] = tmpBuilder.toString();
+            }
+        }
 
         if ((actualCmd = isCommand(command[0])) != null) { // Check if the command exist
             // Add parameters to the object
@@ -123,7 +168,6 @@ public abstract class Command {
                 actualCmd.setParameters(command[i]);
             }
         } else { // Check for PATH's programs
-            // FIXME: Changing cd in the program doesn't change it in the Shell
             String program = type.checkPath(command[0]);
             if (!program.isEmpty()) {
                 executePath(program, input);
