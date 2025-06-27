@@ -18,7 +18,7 @@ public abstract class Command {
     protected ArrayList<String> aliases = new ArrayList<>();
     protected ArrayList<String> parameters = new ArrayList<>();
 
-    protected abstract void execute();
+    protected abstract void execute() throws IOException;
 
     protected static File currentPath = new File(System.getProperty("user.home"));
     protected static String cwd = currentPath.getAbsolutePath();
@@ -26,12 +26,12 @@ public abstract class Command {
     private static Echo echo;
     private static Type type;
     private static PWD pwd;
+    private static CD cd;
+    private static LS ls;
 
     public static String getCwd() {
         return cwd;
     }
-
-    private static Command cd;
 
     public static Echo getEcho() {
         return echo;
@@ -48,6 +48,8 @@ public abstract class Command {
     public static Command getCd() {
         return cd;
     }
+
+    public static LS getLs() {return ls;}
 
     /**
      * Return the parameters in the initial state in order to be reused later
@@ -97,6 +99,7 @@ public abstract class Command {
         commands.add(type = new Type("type"));
         commands.add(pwd = new PWD("pwd"));
         commands.add(cd = new CD("cd"));
+        commands.add(ls = new LS("ls"));
         // TODO: Add other commands...
     }
 
@@ -165,7 +168,11 @@ public abstract class Command {
         if ((actualCmd = isCommand(command[0])) != null) { // Check if the command exist
             // Add parameters to the object
             for (int i = 1; i < command.length; i++) {
-                actualCmd.setParameters(command[i]);
+                if (command[i].startsWith("-")) { // If is an alias
+                    actualCmd.setAliases(command[i]);
+                } else { // if is a parameter
+                    actualCmd.setParameters(command[i]);
+                }
             }
         } else { // Check for PATH's programs
             String program = type.checkPath(command[0]);
