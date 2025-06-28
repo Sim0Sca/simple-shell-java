@@ -1,12 +1,7 @@
 package com.shish;
 
-import com.sun.jna.LastErrorException;
-import com.sun.jna.Library;
-import com.sun.jna.Native;
-
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileStore;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -28,6 +23,10 @@ public class ListElement {
         return dimension;
     }
 
+    /**
+     * Calculate the number of blocks occupied by the file
+     * @throws IOException
+     */
     public void setDimension() throws IOException {
         File file = new File(Command.getCwd() + "/" + this.name);
         Path filePath = file.toPath();
@@ -51,7 +50,7 @@ public class ListElement {
         if (result == 0) {
             dimension = stat.st_blocks / 2;
         } else {
-            System.err.println("Errore durante l'esecuzione di stat.");
+            System.err.println("Error during stat execution.");
         }
     }
 

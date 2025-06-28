@@ -2,9 +2,6 @@ package com.shish;
 
 import com.sun.jna.Structure;
 
-import java.util.Arrays;
-import java.util.List;
-
 
 @Structure.FieldOrder({
         "st_dev", "st_ino", "st_nlink",
@@ -28,7 +25,7 @@ public class Stat extends Structure {
     public Timespec st_atim;    // last access time
     public Timespec st_mtim;    // last mod time
     public Timespec st_ctim;    // last status change time
-    public long __glibc_reserved0;  // riservati per compatibilità
+    public long __glibc_reserved0;  // reserved for compatibility
     public long __glibc_reserved1;
     public long __glibc_reserved2;
 }

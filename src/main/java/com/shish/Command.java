@@ -28,6 +28,7 @@ public abstract class Command {
     private static PWD pwd;
     private static CD cd;
     private static LS ls;
+    private static StatCommand statCommand;
 
     public static String getCwd() {
         return cwd;
@@ -50,6 +51,10 @@ public abstract class Command {
     }
 
     public static LS getLs() {return ls;}
+
+    public static StatCommand getStatCommand() {
+        return statCommand;
+    }
 
     /**
      * Return the parameters in the initial state in order to be reused later
@@ -100,6 +105,7 @@ public abstract class Command {
         commands.add(pwd = new PWD("pwd"));
         commands.add(cd = new CD("cd"));
         commands.add(ls = new LS("ls"));
+        commands.add(statCommand = new StatCommand("stat"));
         // TODO: Add other commands...
     }
 

@@ -6,8 +6,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Timespec extends Structure {
-    public long tv_sec;  // secondi
-    public long tv_nsec; // nanosecondi
+    public long tv_sec;  // seconds
+    public long tv_nsec; // nanoseconds
 
     @Override
     protected List<String> getFieldOrder() {
